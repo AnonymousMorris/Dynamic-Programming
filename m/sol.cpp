@@ -37,9 +37,9 @@ int main() {
                 dp[i][j] = prefix[range_max];
             }
             else {
-                dp[i][j] = prefix[range_max] - prefix[range_min];
+                dp[i][j] = prefix[range_max] - prefix[range_min] + MOD;
             }
-            newPrefix[j] = newPrefix[j-1] + dp[i][j];
+            newPrefix[j] = (newPrefix[j-1] + dp[i][j]);
 
             dp[i][j] %= MOD;
             newPrefix[j] %= MOD;
@@ -47,7 +47,7 @@ int main() {
         swap(prefix, newPrefix);
     }
 
-    cout << dp[n-1][k];
+    cout << dp[n-1][k] << endl;
 
     // cout << endl;
     // for (auto i : dp) {
