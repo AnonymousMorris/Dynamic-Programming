@@ -6,7 +6,7 @@ This blog post is a compiled list of insights I gained on Dynamic Programming fr
 
 Dynamic Programming (DP) is my favorite area in competitive programming. At its core, DP is about breaking a problem down into subproblems where the subproblems are easier to solve and can be easily combined to form the solution to the whole problem once it is solved. The key to being good at DP is being able to recognize how you can reorganize the problem and the dependence relation of each subproblem which gives hints to how you can structure your DP. 
 
-One excellent resource for learning DP is the [atcoder dp contest][https://atcoder.jp/contests/dp]. The contest consist of 26 classic dynamic problems arranged in increasing levels of difficulty with each problem displaying a unique new trick to DP. 
+One excellent resource for learning DP is the [atcoder dp contest][https://atcoder.jp/contests/dp]. The contest consist of 26 classic dynamic problems arranged in increasing levels of difficulty with each problem displaying a unique new trick to DP. In this blog, I try to generalize the lesson of each problem so that they might be applied to all dynamic programming problem. The main focus is on the insight I learned rather than the solution itself because there is already an excellent [editorial][https://nwatx.me/post/atcoderdp] by Neo Wang.
 
 ## List of insights
 
@@ -267,3 +267,49 @@ Let **X** and **Y** be Taro and Jiro's total score at the end of the game. Taro 
 1 &le; **a<sub>i</sub>** &le; 10<sup>9</sup>
 
 #### Insight
+
+Notice that we can represent the state in a few dimensions. One, whose turn it is. Two, the starting and ending position of the sub-array left. The size of this dp is 2* N<sup>2</sup>. 
+
+Now we apply the idea of the min max algorithm which we touched on in problem K. If it's first player's turn, we try to maximize. If it's second player's turn, we minimize.
+
+### [M: Candies][https://atcoder.jp/contests/dp/tasks/dp_m]
+
+#### Problem Statement
+
+How can you distribute **K** candies to **N** children where **i<sup>th</sup>** child can have between **0** and **a<sub>i</sub>** candies. There cannot be any candies left over.
+
+#### Input
+
+1 &le; **N** &le; 100
+
+0 &le; **K** &le; 10<sup>5</sup>
+
+0 &le; **a<sub>i</sub>** &le; **K**
+
+#### Insight
+
+From counting, we know that we can consider each event independently and often add the possibilities up or multiply them together.
+
+In this case, since we are partitioning. We want to add up the possibilities if we distribute 0 candy to children i,1 candy to children i, 2 candy, ...
+
+Summing this will take O(n) time but we since we are repeated doing range sum, we can use a prefix sum.
+
+### [N: Slimes][https://atcoder.jp/contests/dp/tasks/dp_n]
+
+#### Problem Statement
+
+There are **N** slimes which can be merged with adjacent slimes. Each slime has a size of **a<sub>i</sub>** and the cost of merging two slimes is **x + y** where **x** is the cost of the left slime and **y** is the cost of the right slime.
+
+What is the minimum cost to merge all **N** slime?
+
+#### Input
+
+2 &le; **N** &le; 400
+
+1 &le; **a<sub>i</sub>** &le; 10<sup>9</sup>
+
+#### Insight
+
+The "action" we do in this problem is merging. From that, we can see that we can use dp to solve the sub problem of optimal left and optimal right slime.
+
+ 
