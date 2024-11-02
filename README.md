@@ -312,4 +312,73 @@ What is the minimum cost to merge all **N** slime?
 
 The "action" we do in this problem is merging. From that, we can see that we can use dp to solve the sub problem of optimal left and optimal right slime.
 
- 
+ ### [O: Matching][https://atcoder.jp/contests/dp/tasks/dp_o]
+
+#### Problem Statement
+
+There are **N** men and women as well as a compatibility matrix. How many ways are the to pair up all **N** men and women?
+
+#### Input
+
+1 &le; **N** &le; 21
+
+**a<sub>i, j</sub>** are 0 or 1
+
+#### Insight
+
+2<sup>21</sup> is around 10<sup>6</sup> so we can represent every combination of men or women in the state but not both men and women. 
+
+Similar to knapsack and other optimization problem, we can break the problem down to subproblem of including **m<sub>0</sub>** up to **m<sub>i</sub>**. Now when we include **m<sub>i+1</sub>** into consideration, we just need to check all the states where **m<sub>i+1</sub>** is compatible with some **w<sub>j</sub>** where **w<sub>j</sub>** is not already paired with some **m<sub>0</sub>** to **m<sub>i</sub>**
+
+### [P: Independent Set][https://atcoder.jp/contests/dp/tasks/dp_p]
+
+#### Problem Statement
+
+Given a tree with **N** vertices, how many ways can you paint the tree in white or black such that no 2 black vertex are adjacent?
+
+#### Input
+
+1 &le; **N** &le; 10<sup>5</sup>
+
+1 &le; **x<sub>i</sub>**, **y<sub>i</sub>** &le; N
+
+The given graph is a tree
+
+#### Insight
+
+Quite evidently, the number of ways to paint a vertex black is the number of ways to pain all adjacent vertice white multiplied together. While the number of ways to paint a node white is the number of ways to paint all adjacent vertices either white or black multiplied together.
+
+While it appears that the number of ways to paint a vertex is dependent on both the number of ways to paint its parent as well as its children, making it impossible to do dp. 
+
+We can realize that this is not true if we view it as a tree. Then the number of ways to paint a tree is the number of ways to paint all the subtree of the root multiplied together. 
+
+### [Q: Flowers][https://atcoder.jp/contests/dp/tasks/dp_q]
+
+#### Problem Statement
+
+There are **N** flowers with each flower having a height **h<sub>i</sub>** and a beauty **b<sub>i</sub>**. 
+
+You are to remove some flowers such that by the end, the flowers height are monotone increasing. What is the maximum beauty you can achieve? 
+
+#### Input
+
+1 &le; **N** &le; 2*10<sup>5</sup>
+
+1 &le; **h<sub>i</sub>** &le; N
+
+**h<sub>1</sub>**, **h<sub>2</sub>**, ... **h<sub>N</sub>** are distinct
+
+1 &le; **a<sub>i</sub>** &le; 10<sup>9</sup>
+
+#### Insight
+
+Every time we decide to use a flower, we limit the height of flowers that come after. 
+
+If we decide to use a **f<sub>i</sub>**, the the maximum beauty we can achieve is dp[h<sub>i</sub>] + b<sub>i</sub> assuming that dp is monotone increasing as h increases.
+
+Now, since we want to find dp[h<sub>i</sub>] fast, we can use binary search.
+
+### [R: Walk][https://atcoder.jp/contests/dp/tasks/dp_r]
+
+#### Problem Statement
+
