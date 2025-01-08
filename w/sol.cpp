@@ -1,100 +1,156 @@
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
 #define ll long long
 
 using namespace std;
 
 struct Node {
-    int l, r, val, tag;
+    int l, r;
+    ll val, tag;
     Node *lc, *rc;
-    Node (int bl, int br) {
-        l = bl, r = br, val = 0, tag = 0;
-        int mid = (bl + br) >> 1;
-        if (bl == br) lc = rc = nullptr;
-        else lc = new Node(bl, mid), rc = new Node(mid + 1, br); 
-    }
-    
-    ~Node() {
-        delete lc;
-        delete rc;
+
+    Node (int left, int right) {
+        l = left;
+        r = right;
+        val = 0;
+        tag = 0;
+        if (l == r) {
+            lc = rc = nullptr;
+        }
+        else {
+            int mid = (left + right) / 2;
+            lc = new Node(left, mid);
+            rc = new Node(mid+1, right);
+        }
     }
 
-    ll add(int bl, int br, int val) {
-        // break condition
-        if (r < bl || br < l) return val;
-        // tag condition
-        if (bl <= l && r <= br) {
-            putTag(val);
+    void range_add(int left, int right, ll value) {
+        // completely outside
+        if (left > r || right < l) {
+            return;
+        }
+        // completely inside
+        if (left <= l && right >= r) {
+            apply_tag(value);
+            return;
+        }
+        // partially inside
+        lc -> range_add(left, right, value);
+        rc -> range_add(left, right, value);
+        val = max_child();
+    }
+
+    ll range_query(int left, int right, ll tag_val) {
+        // completely outside
+        if (left > r || right < l) {
+            apply_tag(tag_val);
+            return LONG_LONG_MIN;
+        }
+        // completely inside
+        if (left <= l && right >= r) {
+            apply_tag(tag_val);
             return val + tag;
         }
-        return lc -> add(bl, br, val) + rc -> add(bl, br, val);
-    }
-
-    int qry(int ql, int qr, int tagVal) {
-        // break condition
-        if (ql > r || qr < l) {
-            putTag(tagVal);
-            return 0;
-        }
-        // tag condition
-        if (ql >= l && qr <= r) {
-            putTag(tagVal);
-            return val;
-        }
-        tagVal += getTag();
-        val = max(lc -> qry(ql, qr, tagVal), rc -> qry(ql, qr, tagVal));
-        return val;
-    }
-
-    void putTag (int tagVal) {
-        if (l == r) val += tagVal;
-        else tag += tagVal;
-    }
-
-    int getTag() {
-        int tmp = tag;
+        // partially inside
+        int new_tag_val = tag_val + tag;
         tag = 0;
-        return tmp;
+
+        ll ans =  max(lc -> range_query(left, right, new_tag_val) 
+            , rc -> range_query(left, right, new_tag_val));
+        val = max_child();
+        return ans;
     }
 
-    void print() {
-        if (l == r) cout << val;
-        else {
-            cout << " (";
-            lc -> print();
-            cout << "[";
-            cout << val;
-            cout << ", ";
-            cout << tag;
-            cout << "]";
-            rc -> print();
-            cout << ") ";
+    void set(int idx, ll value) {
+        ll idx_val = range_query(idx, idx, 0);
+        range_add(idx, idx, -idx_val);
+        range_add(idx, idx, value);
+        assert(idx >= l && idx <= r);
+        string msg = "expected: " + to_string(idx_val) + " got: " + to_string(range_query(idx, idx, 0));
+        if (range_query(idx, idx, 0) != value)
+            cerr <<  msg;
+        assert(range_query(idx, idx, 0) == value);
+    }
+    
+
+    void apply_tag(ll tag_val) {
+        if (l == r) 
+            val += tag_val;
+        else 
+            tag += tag_val;
+    }
+
+    ll max_child() {
+        if (l == r) 
+            return 0;
+
+        ll l_val = lc->val + lc->tag;
+        ll r_val = rc->val + rc->tag;
+        return max(l_val, r_val);
+    }
+
+    void print(int depth) {
+        indent(depth);
+        cout << "(" << l << "," << r << ": v=" << val << ", tag=" << tag << "\n";
+        if (lc != nullptr)
+            lc -> print(++depth);
+        if (rc != nullptr)
+            rc -> print(depth);
+    }
+    
+    void indent(int cnt) {
+        for (int i = 0; i < cnt; i++) {
+            cout << "   ";
         }
     }
 };
 
-// int main() {
-//     int n, m;
-//     cin >> n >> m;
-//     vector<tuple<int , int, int>> range(m);
-//     vector<int>dp(n);
-//     for (int i = 0; i < m; i++) {
-//         cin >> get<0>(range[i]) >> get<1>(range[i]) >> get<2>(range[i]);
-//     }
-//     sort(range.begin(), range.end());
-//
-//     dp[0] = 
-//     for (int i = 0; i < n; i++) {
-//         
-//     }
-//
-// }
-//
+
+struct range {
+    int l, r, v;
+    void print() {
+        cout << "l: " << l << " r: " << r << endl;
+    }
+};
+
+void print_dp(Node tree) {
+    for(int i = 0; i <= tree.r; i++) {
+        cout << i << ": " << tree.range_query(i, i, 0) << endl;
+    }
+}
+
+
 int main() {
-    Node *seg = new Node(0, 10);
-    seg->add(0, 3, 5);
-    cout << seg -> qry(3, 3, 0) << endl;
-    seg -> print();
-    seg -> add(3, 5, 3);
-    cout << seg -> qry(1, 10, 0) << endl;
-    seg -> print();
+    int n, m;
+    cin >> n >> m;
+    vector<range> ranges(m);
+    for (auto &i: ranges) {
+        cin >> i.l >> i.r >> i.v;
+    }
+    vector<range> by_end(ranges);
+    sort(by_end.begin(), by_end.end(), [](range a, range b) {
+            return a.r < b.r;
+    });
+
+    Node dp = Node(0, n);
+    for (auto i : ranges) {
+        dp.range_add(i.l, i.r, -i.v);
+    }
+    int by_end_ptr = 0;
+
+    for (int i = 1; i <= n; i++) {
+        while (by_end_ptr < m && by_end[by_end_ptr].r < i) {
+            range cur = by_end[by_end_ptr];
+            dp.range_add(cur.l, cur.r, cur.v);
+            by_end_ptr++;
+        }
+
+        dp.set(i, dp.range_query(0, i-1, 0));
+    }
+    while (by_end_ptr < m && by_end[by_end_ptr].r <= n) {
+        range cur = by_end[by_end_ptr];
+        dp.range_add(cur.l, cur.r, cur.v);
+        by_end_ptr++;
+    }
+
+    cout << dp.range_query(0, n, 0);
 }
